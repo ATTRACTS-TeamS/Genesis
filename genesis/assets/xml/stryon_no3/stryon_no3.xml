@@ -1,0 +1,98 @@
+<mujoco model="stryon_no3">
+    <compiler angle="degree"/>
+    <option gravity="0 0 -9.81"/>
+    <asset>
+        <material name="black" rgba="0.4 0.4 0.4 1"/>
+        <mesh name="body" file="body.STL"/>
+        <mesh name="injection_unit" file="injection_unit.STL"/>
+        <mesh name="left_back_knee" file="left_back_knee.STL"/>
+        <mesh name="left_back_leg" file="left_back_leg.STL"/>
+        <mesh name="left_front_knee" file="left_front_knee.STL"/>
+        <mesh name="left_front_leg" file="left_front_leg.STL"/>
+        <mesh name="left_wheel" file="left_wheel.STL"/>
+        <mesh name="right_back_knee" file="right_back_knee.STL"/>
+        <mesh name="right_back_leg" file="right_back_leg.STL"/>
+        <mesh name="right_front_knee" file="right_front_knee.STL"/>
+        <mesh name="right_front_leg" file="right_front_leg.STL"/>
+        <mesh name="right_wheel" file="right_wheel.STL"/>
+    </asset>
+
+    <worldbody>
+        <light name="top" pos="0 0 2" mode="trackcom"/>
+        <body name="body_link" pos="0 0 0.15">
+            <!-- <joint name="free_joint" type="free"/> -->
+            <geom type="mesh" material="black" mesh="body" mass="2.54988"/>
+            <!-- <inertial pos="0.00335 -0.00268 -0.00822" mass="2.54988" fullinertia="0.01111537741 0.0148649804 0.02116610234 0.00068990981 -0.00051555687 0.00038488431"/> -->
+            <!-- <inertial pos="0.00335 -0.00268 -0.00822" mass="2.54988" fullinertia="0.01092468004 0.01466387854 0.0211191628 0.00071279576 -0.00044524392 0.00032876064"/> -->
+            <body name="left_back_knee" pos="0 0 0">
+                <joint name="left_back_knee_joint" pos="-0.06 0.0565 0" axis="0 1 0"/>
+                <geom type="mesh" material="black" mesh="left_back_knee" mass="0.12383" contype="0" conaffinity="0"/>
+                <!-- <inertial pos="-0.08969 0.0769 -0.05237" mass="0.12383" fullinertia="0.00058203594 0.00051583806 0.00007115694 0.00000001726 0.00000021394 -0.00015211396"/> -->
+                <!-- <inertial pos="-0.08969 0.0769 -0.05237" mass="0.12383" fullinertia="0.00008175112 0.00006710777 0.00001960222 0.00000005405 0.00000000358 -0.00000001493"/> -->
+                <body name="left_back_leg" pos="0 0 0">
+                    <joint name="left_back_leg_joint" pos="-0.09444107 0.0735 -0.06094234" axis="0 1 0"/>
+                    <geom type="mesh" material="black" mesh="left_back_leg" mass="0.22612" contype="0" conaffinity="0"/>
+                    <!-- <inertial pos="-0.00385 0.06834 -0.06314" mass="0.22612" fullinertia="0.00196000053 0.00198125488 0.00008080651 0.0000005205 0.00000729028 0.00014376073"/> -->
+                    <!-- <inertial pos="-0.00385 0.06834 -0.06314" mass="0.22612" fullinertia="0.00024775871 0.00028212554 0.00006763075 -0.00000012438 -0.00000004171 -0.00000568205"/> -->
+                    <body name="left_wheel" pos="0 0 0">
+                        <joint name="left_wheel_joint" pos="0.00553793 0.0795 -0.06299145" axis="0 1 0"/>
+                        <geom type="mesh" material="black" mesh="left_wheel" mass="0.4178" friction="1.0 0.02 0.002"/>
+                        <!-- <inertial pos="0.00554 0.09112 -0.06299" mass="0.4178" fullinertia="0.00016840558 0.00029044358 0.00016840558 0 0 0"/> -->
+                        <!-- <inertial pos="0.00554 0.09112 -0.06299" mass="0.4178" fullinertia="0.00016693777 0.00029044358 0.00016693777 0 0 0"/> -->
+                    </body>
+                </body>
+            </body>
+            <body name="left_front_knee" pos="0 0 0">
+                <joint name="left_front_knee_joint" pos="0.06 0.0565 0" axis="0 1 0"/>
+                <geom type="mesh" material="black" mesh="left_front_knee" mass="0.12383" contype="0" conaffinity="0"/>
+                <!-- <inertial pos="0.09926 0.06821 -0.04659" mass="0.12383" fullinertia="0.00055412394 0.00052239096 0.00003665992 -0.00000003449 -0.00000018222 -0.00008284929"/> -->
+                <!-- <inertial pos="0.09926 0.06821 -0.04659" mass="0.12383" fullinertia="0.00007743933 0.00006268877 0.0000196774 -0.00000006325 -0.00000003256 0.00000550725"/> -->
+                <body name="left_front_leg" pos="0 0 0">
+                    <joint name="left_front_leg_joint" pos="0.10509065 0.059 -0.05354281" axis="0 1 0"/>
+                    <geom type="mesh" material="black" mesh="left_front_leg" mass="0.02437" contype="0" conaffinity="0"/>
+                    <!-- <inertial pos="0.05351 0.05143 -0.05837" mass="0.02437" fullinertia="0.00010940169 0.00010811568 0.00000362436 0.00000000009 -0.00000000001 -0.00001308848"/> -->
+                    <!-- <inertial pos="0.05351 0.05143 -0.05837" mass="0.02437" fullinertia="0.00004175736 0.00004270523 0.00000139049 -0.00000000015 0.00000000133 -0.00000100053"/> -->
+                </body>
+            </body>
+            <body name="right_back_knee" pos="0 0 0">
+                <joint name="right_back_knee_joint" pos="-0.06 -0.0565 0" axis="0 1 0"/>
+                <geom type="mesh" material="black" mesh="right_back_knee" mass="0.12383" contype="0" conaffinity="0"/>
+                <!-- <inertial pos="-0.08955 -0.0769 -0.05245" mass="0.12383" fullinertia="0.00058203594 0.00051583806 0.00007115694 0.00000001726 0.00000021394 -0.00015211396"/> -->
+                <!-- <inertial pos="-0.08955 -0.0769 -0.05245" mass="0.12383" fullinertia="0.00008175112 0.00006710777 0.00001960222 0.00000005405 0.00000000358 -0.00000001493"/> -->
+                <body name="right_back_leg" pos="0 0 0">
+                    <joint name="right_back_leg_joint" pos="-0.09444107 -0.0735 -0.06094234" axis="0 1 0"/>
+                    <geom type="mesh" material="black" mesh="right_back_leg" mass="0.19241" contype="0" conaffinity="0"/>
+                    <!-- <inertial pos="-0.00394 -0.06865 -0.06313" mass="0.19241" fullinertia="0.00178242904 0.0017885053 0.0000831711 0.00000068865 -0.00000601103 -0.00019986374"/> -->
+                    <!-- <inertial pos="-0.00394 -0.06865 -0.06313" mass="0.19241" fullinertia="0.00018169533 0.00021165782 0.00005924191 -0.00000002805 -0.00000019056 -0.00000570326"/> -->
+                    <body name="right_wheel" pos="0 0 0">
+                        <joint name="right_wheel_joint" pos="0.00553793 -0.0795 -0.06299145" axis="0 1 0"/>
+                        <geom type="mesh" material="black" mesh="right_wheel" mass="0.4178" friction="1.0 0.02 0.002"/>
+                        <!-- <inertial pos="0.00554 -0.09112 -0.06299" mass="0.4178" fullinertia="0.00016840558 0.00029044358 0.00016840558 0 0 0"/> -->
+                        <!-- <inertial pos="0.00554 -0.09112 -0.06299" mass="0.4178" fullinertia="0.00016693777 0.00029044358 0.00016693777 0 0 0"/> -->
+                    </body>
+                </body>
+            </body>
+            <body name="right_front_knee" pos="0 0 0">
+                <joint name="right_front_knee_joint" pos="0.06 -0.0565 0" axis="0 1 0"/>
+                <geom type="mesh" material="black" mesh="right_front_knee" mass="0.12383" contype="0" conaffinity="0"/>
+                <!-- <inertial pos="0.09923 -0.06821 -0.04662" mass="0.12383" fullinertia="0.00055412394 0.00052239096 0.00003665992 -0.00000003449 -0.00000018222 -0.00008284929"/> -->
+                <!-- <inertial pos="0.09923 -0.06821 -0.04662" mass="0.12383" fullinertia="0.00007743933 0.00006268877 0.0000196774 -0.00000006325 -0.00000003256 0.00000550725"/> -->
+                <body name="right_front_leg" pos="0 0 0">
+                    <joint name="right_front_leg_joint" pos="0.10509065 -0.059 -0.05354281" axis="0 1 0"/>
+                    <geom type="mesh" material="black" mesh="right_front_leg" mass="0.02437" contype="0" conaffinity="0"/>
+                    <!-- <inertial pos="0.05352 -0.05143 -0.05851" mass="0.02437" fullinertia="0.00010940169 0.00010811568 0.00000362436 0.00000000009 -0.00000000001 -0.00001308848"/> -->
+                    <!-- <inertial pos="0.05352 -0.05143 -0.05851" mass="0.02437" fullinertia="0.00004175736 0.00004270523 0.00000139049 -0.00000000015 0.00000000133 -0.00000100053"/> -->
+                </body>
+            </body>
+            <body name="injection_unit" pos="0 0 0">
+                <geom type="mesh" material="black" mesh="injection_unit" mass="0.37105"/>
+                <!-- <inertial pos="0.00646 -0.00213 0.13007" mass="0.37105" fullinertia="0.00285191879 0.00333014501 0.00093004326 0.00003416744 0.00003416744 -0.00003757799"/> -->
+                <!-- <inertial pos="0.00646 -0.00213 0.13007" mass="0.37105" fullinertia="0.00060033771 0.00106728623 0.00091589137 0.00003844206 0.00011751278 0.00001928742"/> -->
+            </body>
+        </body>
+    </worldbody>
+    <equality>
+        <connect name="left_closed_loop" active="true" body1="left_back_leg" body2="left_front_leg" anchor="0.00553793 0 -0.06299145"/>
+        <connect name="right_closed_loop" active="true" body1="right_back_leg" body2="right_front_leg" anchor="0.00553793 0 -0.06299145"/>
+    </equality>
+</mujoco>
