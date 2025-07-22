@@ -20,7 +20,7 @@
     <worldbody>
         <light name="top" pos="0 0 2" mode="trackcom"/>
         <body name="body_link" pos="0 0 0.15">
-            <!-- <joint name="free_joint" type="free"/> -->
+            <joint name="free_joint" type="free"/>
             <geom type="mesh" material="black" mesh="body" mass="2.54988"/>
             <!-- <inertial pos="0.00335 -0.00268 -0.00822" mass="2.54988" fullinertia="0.01111537741 0.0148649804 0.02116610234 0.00068990981 -0.00051555687 0.00038488431"/> -->
             <!-- <inertial pos="0.00335 -0.00268 -0.00822" mass="2.54988" fullinertia="0.01092468004 0.01466387854 0.0211191628 0.00071279576 -0.00044524392 0.00032876064"/> -->
