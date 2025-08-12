@@ -209,6 +209,10 @@ def get_cfgs():
     terrain_cfg = {
         "terrain": True,
         "textures": "./genesis/assets/textures/stryon_no3_train.png",
+        "respawn_points": [
+            [4.2, 5.25, 0.0],
+            [12.6, 5.25, 0.0],
+        ],
         "horizontal_scale": 0.1,
         "vertical_scale": 0.001,
     }

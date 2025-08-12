@@ -12,7 +12,6 @@ def gs_rand_float(lower, upper, shape, device):
 
 # TODO
 # - Disabled damping curriculum
-# - Terrain support (Genesis v0.2.1)
 # - Domain randomization
 # The complete code is https://github.com/Albusgive/wheel_legged_genesis/blob/main/locomotion/wheel_legged_env.py
 class StryonNo3Env:
@@ -75,24 +74,33 @@ class StryonNo3Env:
         # Add plane
         self.scene.add_entity(gs.morphs.URDF(file="urdf/plane/plane.urdf", fixed=True))
 
+        # Init robot quat and pos
+        self.base_init_pos = torch.tensor(self.env_cfg["base_init_pos"], device=self.device)
+        self.base_init_quat = torch.tensor(self.env_cfg["base_init_quat"], device=self.device)
+        self.inv_base_init_quat = inv_quat(self.base_init_quat)
+
         # Add terrain
+        terrain_pos = []
         self.horizontal_scale = self.terrain_cfg["horizontal_scale"]
         self.vertical_scale = self.terrain_cfg["vertical_scale"]
+        self.respawn_points = self.terrain_cfg["respawn_points"]
         self.height_field = cv2.imread(self.terrain_cfg["textures"], cv2.IMREAD_GRAYSCALE)
+        self.terrain_height = torch.tensor(self.height_field, device=self.device) * self.vertical_scale
         if self.terrain_cfg["terrain"]:
             self.terrain = self.scene.add_entity(
                 morph=gs.morphs.Terrain(
-                    pos=(-4.2, -5.25, 0.0),
                     height_field=self.height_field,
                     horizontal_scale=self.horizontal_scale,
                     vertical_scale=self.vertical_scale,
                 ),
             )
+            if self.mode:
+                for i in range(len(self.respawn_points)):
+                    terrain_pos.append(self.respawn_points[i])
 
-        # Init roboot quat and pos
-        self.base_init_pos = torch.tensor(self.env_cfg["base_init_pos"], device=self.device)
-        self.base_init_quat = torch.tensor(self.env_cfg["base_init_quat"], device=self.device)
-        self.inv_base_init_quat = inv_quat(self.base_init_quat)
+        self.num_respawn_points = len(terrain_pos)
+        self.base_terrain_pos = torch.tensor(terrain_pos, device=self.device)
+        self.base_terrain_pos[:, 2] += self.base_init_pos[2]
 
         # Add robot
         base_init_pos = self.base_init_pos.cpu().numpy()
@@ -319,7 +327,7 @@ class StryonNo3Env:
 
         # Update base and joint state buffers
         self.episode_length_buf += 1
-        self.base_pos[:] = self.robot.get_pos()
+        self.base_pos[:] = self.get_relative_terrain_pos(self.robot.get_pos())
         self.base_quat[:] = self.robot.get_quat()
         self.base_euler = quat_to_xyz(
             transform_quat_by_quat(torch.ones_like(self.base_quat) * self.inv_base_init_quat, self.base_quat),
@@ -456,11 +464,15 @@ class StryonNo3Env:
             envs_idx=envs_idx,
         )
 
-        # Reset base orientation (quaternion)
-        self.base_quat[envs_idx] = self.base_init_quat.reshape(1, -1)
-
         # Apply base position and orientation
-        self.base_pos[envs_idx] = self.base_init_pos
+        self.base_quat[envs_idx] = self.base_init_quat.reshape(1, -1)
+        if self.terrain_cfg["terrain"] and self.mode and self.num_respawn_points > 0:
+            n = len(envs_idx)
+            rand_idx = torch.randint(low=0, high=self.num_respawn_points, size=(n,), device=self.device)
+            self.base_pos[envs_idx] = self.base_terrain_pos[rand_idx]
+        else:
+            self.base_pos[envs_idx] = self.base_init_pos
+
         self.robot.set_pos(self.base_pos[envs_idx], zero_velocity=False, envs_idx=envs_idx)
         self.robot.set_quat(self.base_quat[envs_idx], zero_velocity=False, envs_idx=envs_idx)
 
@@ -636,6 +648,36 @@ class StryonNo3Env:
                     f"range: [{old_ang_range[0]:.3f}, {old_ang_range[1]:.3f}] → "
                     f"[{new_ang_range[0]:.3f}, {new_ang_range[1]:.3f}] | {action}"
                 )
+
+    def get_relative_terrain_pos(self, base_pos):
+        if not self.terrain_cfg["terrain"]:
+            return base_pos
+
+        x = base_pos[:, 0]
+        y = base_pos[:, 1]
+
+        fx = x / self.horizontal_scale
+        fy = y / self.horizontal_scale
+
+        x0 = torch.floor(fx).int()
+        x1 = torch.min(x0 + 1, torch.full_like(x0, self.terrain_height.shape[1] - 1))
+        y0 = torch.floor(fy).int()
+        y1 = torch.min(y0 + 1, torch.full_like(y0, self.terrain_height.shape[0] - 1))
+
+        x0 = torch.clamp(x0, 0, self.terrain_height.shape[1] - 1)
+        x1 = torch.clamp(x1, 0, self.terrain_height.shape[1] - 1)
+        y0 = torch.clamp(y0, 0, self.terrain_height.shape[0] - 1)
+        y1 = torch.clamp(y1, 0, self.terrain_height.shape[0] - 1)
+
+        Q11 = self.terrain_height[y0, x0]
+        Q21 = self.terrain_height[y0, x1]
+        Q12 = self.terrain_height[y1, x0]
+        Q22 = self.terrain_height[y1, x1]
+        wx = fx - x0
+        wy = fy - y0
+        height = (1 - wx) * (1 - wy) * Q11 + wx * (1 - wy) * Q21 + (1 - wx) * wy * Q12 + wx * wy * Q22
+        base_pos[:, 2] -= height
+        return base_pos
 
     # ------------ reward functions----------------
     def reward_tracking_lin_x_vel(self):
