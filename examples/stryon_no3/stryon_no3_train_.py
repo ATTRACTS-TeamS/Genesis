@@ -12,18 +12,18 @@ def get_train_cfg(exp_name, max_iterations):
     train_cfg_dict = {
         "algorithm": {
             "class_name": "PPO",
-            "clip_param": 0.20,
-            "desired_kl": 0.02,
-            "entropy_coef": 0.002,
+            "clip_param": 0.2,
+            "desired_kl": 0.01,
+            "entropy_coef": 0.01,
             "gamma": 0.99,
             "lam": 0.95,
-            "learning_rate": 3e-4,
+            "learning_rate": 1e-4,
             "max_grad_norm": 1.0,
-            "num_learning_epochs": 6,
-            "num_mini_batches": 8,
+            "num_learning_epochs": 5,
+            "num_mini_batches": 4,
             "schedule": "adaptive",
             "use_clipped_value_loss": True,
-            "value_loss_coef": 2.0,
+            "value_loss_coef": 1.0,
         },
         "init_member_classes": {},
         "policy": {
@@ -31,7 +31,7 @@ def get_train_cfg(exp_name, max_iterations):
             "activation": "elu",
             "actor_hidden_dims": [512, 256, 128],
             "critic_hidden_dims": [512, 256, 128],
-            "init_noise_std": 0.4,
+            "init_noise_std": 1.0,
         },
         "runner": {
             "checkpoint": -1,
@@ -39,14 +39,14 @@ def get_train_cfg(exp_name, max_iterations):
             "load_run": -1,
             "log_interval": 1,
             "max_iterations": max_iterations,
-            "num_steps_per_env": 32,
+            "num_steps_per_env": 24,
             "record_interval": -1,
             "resume": False,
             "resume_path": None,
             "run_name": "",
             "save_interval": 100,
         },
-        "num_steps_per_env": 32,
+        "num_steps_per_env": 24,
         "save_interval": 100,
         "runner_class_name": "OnPolicyRunner",
         "seed": 1,
@@ -112,9 +112,9 @@ def get_cfgs():
         # PD
         "joint_kp": 3.0,  # TODO: Adjust KP
         "joint_kv": 0.8,  # TODO: Adjust KV
-        "wheel_kv": 2.0,
-        "damping": 0.022,
-        "armature": 0.003,
+        "wheel_kv": 0.07,
+        "damping": 0.01,
+        "armature": 0.002,
         # Termination(degrees)
         "termination_if_roll_greater_than": 25,
         "termination_if_pitch_greater_than": 25,
@@ -133,108 +133,78 @@ def get_cfgs():
         # base pose
         "base_init_pos": [0.0, 0.0, 0.2],
         "base_init_quat": [1.0, 0.0, 0.0, 0.0],
-        "episode_length_s": 12.0,
-        "resampling_time_s": 2.0,
-        "joint_action_scale": 0.55,
-        "wheel_action_scale": 18.0,
-        "simulate_action_latency": False,
+        "episode_length_s": 20.0,
+        "resampling_time_s": 3.0,
+        "joint_action_scale": 0.5,
+        "wheel_action_scale": 10.0,
+        "simulate_action_latency": True,
         "clip_actions": 100.0,
         "convexify": True,
         "decimate_aggressiveness": 4,
-        "action_smooth_alpha_joint": 0.30,  # 0.25~0.40 推奨
-        "action_smooth_alpha_wheel": 0.96,  # 0.8~1.0（=弱い/ほぼ無し）
-        "max_joint_speed": 2.0,             # [rad/s] 1.5~2.4 で調整
     }
     obs_cfg = {
         # num_obs = num_slice_obs + history_length * num_slice_obs
-        "num_obs": 260,  # 26 + 9 * 26
-        "num_slice_obs": 26,
+        "num_obs": 230,  # 23 + 9 * 23
+        "num_slice_obs": 23,
         "history_length": 9,
         "obs_scales": {
             "lin_vel": 2.0,
             "ang_vel": 2.2,
-            "base_euler": 0.04,
+            "base_euler": 1.0,
             "dof_pos": 1.0,
         },
         "noise": {
             "use": True,
             "ang_vel": [0.01, 0.01],
-            "dof_pos": [0.004, 0.004],
-            "dof_vel": [0.004, 0.004],
-            "base_euler": [0.03, 0.03],
+            "dof_pos": [0.01, 0.01],
+            "dof_vel": [0.01, 0.01],
+            "gravity": [0.01, 0.01],
+            "base_euler": [0.25, 0.25],
         },
     }
     reward_cfg = {
-        "tracking_linx_sigma": 0.3,
+        "tracking_linx_sigma": 0.5,
         "tracking_linx_alpha": 0.5,
         "tracking_ang_sigma": 0.6,
         "tracking_ang_alpha": 0.5,
         "tracking_grav_sigma": 0.05,
-        "tracking_leg_sigma": 0.35,
-        "similar_leg_sigma": 0.3,
         "target_roll": 0.0,
-        "target_pitch": 0.0,
-        "tracking_base_euler_sigma": 8.0,
-        "tracking_roll_sigma": 8.0,
-        "tracking_pitch_sigma": 8.0,
+        "target_pitch": -3.271,
+        "tracking_base_euler_sigma": 3.0,
         "reward_scales": {
-            "tracking_lin_x_vel": 1.3,
-            "tracking_ang_vel": 0.625,
-            "tracking_roll": 0.3,
-            "tracking_pitch": 0.3,
-            "tracking_leg_length": 1.0,
-            "similar_leg": 0.4,
-            "joint_action_rate": -0.03,
-            "wheel_action_rate": -0.015,
+            "tracking_lin_x_vel": 1.0,
+            "tracking_ang_vel": 1.1,
+            "tracking_base_euler": 0.3,
+            "tracking_leg_length": -3.0,
+            "lin_vel_z": -0.02,
+            "joint_action_rate": -0.01,
+            "wheel_action_rate": -0.01,
             "dof_acc": -1e-6,
-            "dof_force": -1e-7,
-            "ang_vel_xy": -0.01,
-            "collision": -0.0004,
-            "survive": 1.2,
+            "dof_force": -1e-6,
+            "ang_vel_xy": -0.02,
+            "collision": -0.0003,
+            "survive": 1.0,
         },
     }
     command_cfg = {
-        "num_commands": 3,
-        "lin_vel_x_range": [-0.7, 0.7],
-        "ang_vel_range": [-2.5, 2.5],
-        "leg_length_angle_range": [0.5, 1.0],
-        "wheel_radius": 0.08675,
-        "axle_width": 0.159,
-        "wheel_forward_sign": {
-            "left_wheel_joint":  +1.0,
-            "right_wheel_joint": +1.0,
-        },
-        "zero_fraction": 0.05,
-        "zero_stable": False,
-        "zero_eps": 0.03,
-        "zero_stable_gain": 0.05,
+        "num_commands": 4,
+        "lin_vel_x_range": [-1.0, 1.0],
+        "ang_vel_range": [-3.14, 3.14],
+        "leg_length_range": [0.0, 0.4],
+        "zero_stable": True,
     }
     curriculum_cfg = {
-        "curriculum_step": 50,
-        "curriculum_lin_vel_step": 0.0035,
-        "curriculum_ang_vel_step": 0.008,
-        "curriculum_lin_vel_min_range": 0.05,
-        "curriculum_ang_vel_min_range": 0.05,
-        "curriculum_leg_step": 0.012,
-        "curriculum_leg_min_range": 0.04,
+        "curriculum_step": 25,
+        "curriculum_lin_vel_step": 0.003,
+        "curriculum_ang_vel_step": 0.005,
+        "curriculum_lin_vel_min_range": 0.01,
+        "curriculum_ang_vel_min_range": 0.015,
         "err_mode": True,
-        "stage0_spawn0_only": True,
-        "lin_vel_err_range": [0.30, 0.45, 0.55],  # 0.21/0.33→0.24/0.45
-        "ang_vel_err_range": [0.28, 0.50, 1.10],  # 0.25/0.45→0.28/0.50
-        "leg_err_range":     [0.24, 0.35, 0.40],  # 0.20/0.33→0.24/0.35
+        "lin_vel_err_range": [0.09, 0.15, 0.5],
+        "ang_vel_err_range": [0.23, 0.4, 1.0],
     }
     domain_rand_cfg = {
-        "friction_ratio_range": [0.7, 1.5],
-        "random_base_mass_shift_range": [-0.5, 0.5],
-        "random_other_mass_shift_range": [-0.05, 0.05],
-        "random_base_com_shift": 0.02,
-        "random_other_com_shift": 0.007,
-        "random_KP": [1.0, 1.0],
-        "random_KV": [1.0, 1.0],
-        "random_default_joint_angles": [-0.02, 0.02],
-        "damping_range": [0.85, 1.25],
-        "dof_stiffness_range": [0.0, 0.0],
-        "dof_armature_range": [0.001, 0.005],
+        # TODO: Domain randomization (Not implemented)
     }
     terrain_cfg = {
         "terrain": True,
@@ -253,7 +223,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--exp_name", type=str, default="stryon_no3_train")
     parser.add_argument("-B", "--num_envs", type=int, default=8192)
-    parser.add_argument("--max_iterations", type=int, default=3000)
+    parser.add_argument("--max_iterations", type=int, default=15000)
     args = parser.parse_args()
 
     gs.init(logging_level="warning", backend=gs.gpu)

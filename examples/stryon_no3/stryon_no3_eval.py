@@ -14,6 +14,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
+third_val = 0.0
+
 
 def init_pygame():
     pygame.init()
@@ -29,31 +31,43 @@ def init_pygame():
 
 
 def get_joystick_commands(joystick):
-    max_lin = 0.8
-    max_ang = 3.0
+    global third_val
+
+    max_lin = 0.7
+    max_ang = 2.5
+    min_leg_length = 0.0
+    max_leg_length = 1.0
+    step = 0.02
 
     reset_flag = False
     pygame.event.pump()
     if joystick.get_button(1):
         reset_flag = True
 
-    axis_left_y = joystick.get_axis(1)
+    axis_left_y  = joystick.get_axis(1)
     axis_right_x = joystick.get_axis(3)
 
     lin_vel_x = -axis_left_y * max_lin
-    ang_vel = -axis_right_x * max_ang
+    ang_vel   = -axis_right_x * max_ang
 
-    commands = [lin_vel_x, ang_vel, 0.0, 0.0]
+    # R1(5)で増、L1(4)で減（DualSense なら通常これでOK）
+    if joystick.get_button(5):
+        third_val = min(third_val + step, max_leg_length)
+    if joystick.get_button(4):
+        third_val = max(third_val - step, min_leg_length)
+
+    commands = [lin_vel_x, ang_vel, third_val]
+    print("current commands:", commands)
     return commands, reset_flag
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--exp_name", type=str, default="stryon_no3_train")
-    parser.add_argument("--ckpt", type=int, default=15000)
+    parser.add_argument("--ckpt", type=int, default=2999)
     args = parser.parse_args()
 
-    gs.init(backend=gs.gpu)
+    gs.init(logging_level="warning", backend=gs.gpu)
     log_dir = f"logs/{args.exp_name}"
     env_cfg, obs_cfg, reward_cfg, command_cfg, curriculum_cfg, domain_rand_cfg, terrain_cfg, train_cfg = pickle.load(
         open(f"{log_dir}/cfgs.pkl", "rb")
